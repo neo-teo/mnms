@@ -45,7 +45,11 @@ ul {
 
 /* ---------- Layout ---------- */
 
+/* Content stops growing past 1440px and centers */
 main {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   padding: 56px 78px 86px;
   display: grid;
   grid-template-columns: 340px 1fr auto;
@@ -84,7 +88,7 @@ main {
 
 /* Goals sit in light gray; the hovered one turns black */
 .goals a {
-  color: #ccc;
+  color: #999;
   transition: color 0.15s;
 }
 
@@ -189,6 +193,30 @@ main {
   margin: 24px auto 0;
 }
 
+/* Shown instead of the page if data.json can't load:
+   the message, then the M&M filling the rest of the screen */
+body.error {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  padding: 40px 16px;
+}
+
+.load-error {
+  font-size: 24px;
+  text-align: center;
+}
+
+.mnm.mnm-full {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  margin: 24px 0 0;
+}
+
 /* Full-screen tint in the theme color during shuffle (sits under the top bar).
    The animation replays each time script.js shows it, and hides it when done */
 .theme-overlay {
@@ -216,7 +244,8 @@ main {
   justify-content: space-between;
   align-items: center;
   gap: 12px 16px;
-  padding: 16px 78px;
+  /* Side padding shrinks smoothly with the window, so the bar doesn't jump between layouts */
+  padding: 16px clamp(16px, 5vw, 78px);
   background: #f4f4f4;
   font-size: 17px;
   color: #555;
@@ -308,9 +337,5 @@ main {
     width: 100%;
     height: auto;
     aspect-ratio: 140 / 190;
-  }
-
-  .bar {
-    padding: 12px 16px;
   }
 }

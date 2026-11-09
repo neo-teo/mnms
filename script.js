@@ -8,7 +8,7 @@ fetch("data.json")
     renderBar(data);
     startClock(data.location);
     loadWeather(data.location);
-    pickTheme(data);
+    pickTheme();
 
     // Shuffle button: shuffle everything, then briefly tint the page
     // in the new theme color (the animation lives in style.css)
@@ -20,7 +20,18 @@ fetch("data.json")
       overlay.hidden = false;
       overlay.addEventListener("animationend", () => (overlay.hidden = true), { once: true });
     });
-  });
+  })
+  .catch(showLoadError);
+
+// If data.json can't load: a full-page M&M with a message on top
+function showLoadError() {
+  document.body.className = "error";
+  document.body.innerHTML = `
+    <p class="load-error">Something went wrong. Please try refreshing.</p>
+    <canvas class="mnm mnm-full" id="mnm" role="img" aria-label="An M&amp;M character"></canvas>
+  `;
+  pickTheme();
+}
 
 // Reorders the student list, the course info rows, the weather lines,
 // the goals and the bar dots, and picks a new theme
@@ -34,7 +45,7 @@ function shuffleEverything(data) {
   }
   renderGoals(shuffle([...data.goals]));
   shuffleBar();
-  pickTheme(data);
+  pickTheme();
 }
 
 function shuffle(array) {
@@ -50,10 +61,20 @@ function shuffle(array) {
 // The theme is a random M&M character (never the same one twice in a row).
 // Its color is set once as the --theme CSS variable, which style.css uses for
 // the text selection and the shuffle overlay, and it's also the favicon.
+const CHARACTERS = [
+  { src: "assets/mnms/red.webp",    color: "#E2231A" },
+  { src: "assets/mnms/yellow.webp", color: "#FFD200" },
+  { src: "assets/mnms/orange.webp", color: "#F58220" },
+  { src: "assets/mnms/purple.webp", color: "#6750A4" },
+  { src: "assets/mnms/green.webp",  color: "#4AA942" },
+  { src: "assets/mnms/brown.webp",  color: "#6B3E26" },
+  { src: "assets/mnms/blue.webp",   color: "#0073CF" },
+];
+
 let theme;
 
-function pickTheme(data) {
-  const others = data.characters.filter((c) => c !== theme);
+function pickTheme() {
+  const others = CHARACTERS.filter((c) => c !== theme);
   theme = others[Math.floor(Math.random() * others.length)];
 
   document.documentElement.style.setProperty("--theme", theme.color);
@@ -127,7 +148,7 @@ function renderBar(data) {
   // Every student gets a dot
   const dots = data.students.map((s, i) => `
     <a class="dot" href="${s.url}" target="_blank" data-index="${i}"
-       style="background: ${s.color}" title="${s.name}"></a>
+       style="background: ${s.color}" title="${s.name}" aria-label="${s.name}"></a>
   `);
 
   const bar = document.getElementById("bar");
@@ -241,7 +262,8 @@ function renderCharacter() {
   canvas.height = Math.round(canvas.clientHeight * ratio);
   const ctx = canvas.getContext("2d");
 
-  const size = DOT * (canvas.width / BOX_W);    // dot size in canvas pixels
+  const scale = Math.min(canvas.width / BOX_W, canvas.height / BOX_H);
+  const size = DOT * scale;                      // dot size in canvas pixels
   const left = (canvas.width - cols * size) / 2; // centered...
   const top = canvas.height - rows * size;       // ...standing on the bottom
 
