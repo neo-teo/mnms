@@ -85,7 +85,8 @@ main {
 
 /* ---------- Middle column ---------- */
 
-.students li,
+/* The whole student row is one link */
+.students a,
 .instructor {
   display: flex;
   justify-content: space-between;
@@ -102,6 +103,10 @@ main {
   height: 20px;
   border-radius: 50%;
   transition: transform 0.15s;
+}
+
+.students li {
+  transition: opacity 0.15s;
 }
 
 /* When a student row or bar dot is hovered, fade the other students */
@@ -134,6 +139,15 @@ main {
   margin-top: 24px;
 }
 
+#school {
+  display: block;
+  text-align: center;
+}
+
+#school:hover {
+  text-decoration: underline;
+}
+
 .shuffle {
   display: block;
   width: calc(100% - 12px);
@@ -141,13 +155,21 @@ main {
   padding: 6px 8px;
   font: inherit;
   color: inherit;
-  text-align: left;
+  text-align: center;
   background: none;
   cursor: pointer;
 }
 
 .shuffle:hover {
-  background: #f4f4f4;
+  text-decoration: underline;
+}
+
+/* Dithered at exactly this size; pixelated keeps the dots crisp */
+.mnm {
+  display: block;
+  width: 140px;
+  margin: 24px auto 0;
+  image-rendering: pixelated;
 }
 
 /* ---------- Top bar ---------- */
@@ -204,7 +226,7 @@ main {
   #school       { order: 4; }
   .col-right    { order: 5; }
 
-  .students li {
+  .students a {
     font-size: 20px;
     line-height: 38px;
   }

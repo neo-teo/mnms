@@ -1,7 +1,10 @@
 {
   "site": {
     "title": "M&Ms — Critical Computation Lab",
-    "school": "Parsons School of Design",
+    "school": {
+      "name": "Parsons School of Design",
+      "url": "https://www.newschool.edu/parsons/"
+    },
     "bulletinBoard": "https://www.are.na/teo-tsivranidis/mnms",
     "typeface": {
       "name": "ABC Areal",

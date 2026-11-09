@@ -9,11 +9,12 @@ fetch("data.json")
     startClock(data.location);
     loadWeather(data.location);
 
-    // Shuffle button reorders the student list and the goals
+    // Shuffle button reorders the student list, the goals and the bar dots
     document.getElementById("shuffle").addEventListener("click", () => {
       const list = document.getElementById("students");
       shuffle([...list.children]).forEach((li) => list.appendChild(li));
       renderGoals(shuffle([...data.goals]));
+      shuffleBar();
     });
   });
 
@@ -31,7 +32,9 @@ function renderCourse(data) {
 
   document.getElementById("description").textContent = data.description;
   renderGoals(data.goals);
-  document.getElementById("school").textContent = data.site.school;
+  const school = document.getElementById("school");
+  school.textContent = data.site.school.name;
+  school.href = data.site.school.url;
 }
 
 // Each goal links to a Google search of its own text.
@@ -52,8 +55,10 @@ function renderStudents(data) {
   document.getElementById("students").innerHTML = data.students
     .map((s, i) => `
       <li data-index="${i}">
-        <a href="${s.url}" target="_blank">${s.name}</a>
-        <span class="dot" style="background: ${s.color}"></span>
+        <a href="${s.url}" target="_blank">
+          ${s.name}
+          <span class="dot" style="background: ${s.color}"></span>
+        </a>
       </li>
     `)
     .join("");
@@ -70,21 +75,20 @@ function renderStudents(data) {
 // ---------- Top bar ----------
 
 function renderBar(data) {
-  // Every student gets a dot, shuffled on each page load
-  const dots = shuffle(data.students.map((s, i) => `
+  // Every student gets a dot
+  const dots = data.students.map((s, i) => `
     <a class="dot" href="${s.url}" target="_blank" data-index="${i}"
        style="background: ${s.color}" title="${s.name}"></a>
-  `));
-
-  const bulletin = `<a class="link" href="${data.site.bulletinBoard}" target="_blank">Bulletin Board</a>`;
-  const typeset = `<span>Typeset in</span>
-    <a class="link" href="${data.site.typeface.url}" target="_blank">${data.site.typeface.name}</a>`;
-
-  // Same arrangement as the design: 3 dots, Bulletin Board, dots, Typeset, last dot
-  const items = [...dots.slice(0, 3), bulletin, ...dots.slice(3, -1), typeset, dots[dots.length - 1]];
+  `);
 
   const bar = document.getElementById("bar");
-  bar.innerHTML = items.join("");
+  bar.innerHTML = dots.join("") + `
+    <a class="link" id="bulletin" href="${data.site.bulletinBoard}" target="_blank">Bulletin Board</a>
+    <span id="typeset">Typeset in
+      <a class="link" href="${data.site.typeface.url}" target="_blank">${data.site.typeface.name}</a>
+    </span>
+  `;
+  shuffleBar();
 
   // Hovering a student's row or their bar dot highlights that student in both places
   const list = document.getElementById("students");
@@ -102,6 +106,20 @@ function renderBar(data) {
       el.addEventListener("mouseleave", () => highlight(false));
     });
   });
+}
+
+// Shuffles the dots, keeping the design's arrangement:
+// 3 dots, Bulletin Board, dots, Typeset in ABC Areal, last dot
+function shuffleBar() {
+  const bar = document.getElementById("bar");
+  const dots = shuffle([...bar.querySelectorAll(".dot")]);
+  bar.append(
+    ...dots.slice(0, 3),
+    document.getElementById("bulletin"),
+    ...dots.slice(3, -1),
+    document.getElementById("typeset"),
+    dots[dots.length - 1]
+  );
 }
 
 function shuffle(array) {
@@ -151,7 +169,8 @@ function loadWeather(location) {
       document.getElementById("temp").textContent = `${Math.round(f)}°F / ${Math.round(c)}°C`;
     })
     .catch(() => {
-      document.getElementById("weather").textContent = "—";
+      document.getElementById("weather").textContent = "--";
+      document.getElementById("temp").textContent = "--";
     });
 }
 
