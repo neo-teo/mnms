@@ -10,19 +10,18 @@ fetch("data.json")
     loadWeather(data.location);
     drawCharacter(data);
 
-    // Shuffle button reorders the student list, the course info rows,
-    // the weather lines, the goals and the bar dots
+    // Shuffle button: shuffle everything and flash the screen
+    // in the new M&M's color for half a second
     document.getElementById("shuffle").addEventListener("click", () => {
-      for (const el of [
-        document.getElementById("students"),
-        document.getElementById("course"),
-        document.querySelector(".now"),
-      ]) {
-        shuffle([...el.children]).forEach((child) => el.appendChild(child));
-      }
-      renderGoals(shuffle([...data.goals]));
-      shuffleBar();
-      drawCharacter(data);
+      const flash = document.getElementById("flash");
+      if (!flash.hidden) return; // already shuffling
+
+      shuffleEverything(data);
+      flash.style.background = currentCharacter.color;
+      flash.hidden = false;
+      setTimeout(() => {
+        flash.hidden = true;
+      }, 500);
     });
   });
 
@@ -30,6 +29,21 @@ fetch("data.json")
 function setFavicon(color) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
   document.getElementById("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
+// Reorders the student list, the course info rows, the weather lines,
+// the goals and the bar dots, and picks a new M&M
+function shuffleEverything(data) {
+  for (const el of [
+    document.getElementById("students"),
+    document.getElementById("course"),
+    document.querySelector(".now"),
+  ]) {
+    shuffle([...el.children]).forEach((child) => el.appendChild(child));
+  }
+  renderGoals(shuffle([...data.goals]));
+  shuffleBar();
+  drawCharacter(data);
 }
 
 // ---------- Left column ----------

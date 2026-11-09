@@ -178,12 +178,27 @@ main {
   margin: 24px auto 0;
 }
 
+/* Full-screen color flash during shuffle (sits under the top bar).
+   Replays every time it's shown; lasts as long as script.js shows it */
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  animation: flash 500ms ease-in-out;
+}
+
+/* Quick fade in, hold, quick fade out */
+@keyframes flash {
+  15%, 85% { opacity: 0.1; }
+}
+
 /* ---------- Top bar ---------- */
 
 .bar {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
