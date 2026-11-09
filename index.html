@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>M&amp;Ms — Critical Computation Lab</title>
+  <link rel="preload" href="fonts/ABCAreal-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top bar: students in random order + links -->
+  <nav class="bar" id="bar"></nav>
+
+  <main>
+    <!-- Left: course info, description, school -->
+    <section class="col-left">
+      <div class="box" id="course"></div>
+      <div class="description">
+        <p id="description"></p>
+        <p class="goals" id="goals"></p>
+      </div>
+      <div class="box" id="school"></div>
+    </section>
+
+    <!-- Middle: students + instructor -->
+    <section class="col-middle">
+      <ul class="students" id="students"></ul>
+      <p class="instructor" id="instructor"></p>
+    </section>
+
+    <!-- Right: date, time, weather -->
+    <section class="col-right">
+      <div class="box now">
+        <p id="date"></p>
+        <p id="time"></p>
+        <p id="place"></p>
+        <p id="weather"></p>
+        <p id="temp"></p>
+      </div>
+      <button class="box shuffle" id="shuffle">Shuffle</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

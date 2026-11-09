@@ -1,0 +1,83 @@
+{
+  "site": {
+    "title": "M&Ms — Critical Computation Lab",
+    "school": "Parsons School of Design",
+    "bulletinBoard": "https://www.are.na/teo-tsivranidis/mnms",
+    "typeface": {
+      "name": "ABC Areal",
+      "url": "https://abcdinamo.com/typefaces/areal"
+    }
+  },
+
+  "course": {
+    "name": "Critical Computation Lab",
+    "term": "Fall 2026",
+    "section": "Section B",
+    "nickname": "M&Ms",
+    "day": "Fridays",
+    "time": "12:10pm-2:50pm",
+    "location": "6E16th Street",
+    "room": "1206"
+  },
+
+  "description": "This class introduces computation and code as an expressive medium for artists and designers.",
+
+  "goals": [
+    "why and how to love code",
+    "examples in practice",
+    "embracing error",
+    "tending patience",
+    "hand coding",
+    "random values",
+    "relative values",
+    "loops",
+    "object oriented programming",
+    "geometry",
+    "math",
+    "coordinate systems",
+    "javascript",
+    "p5.js",
+    "github",
+    "html",
+    "css",
+    "variables",
+    "functions",
+    "classes",
+    "interaction",
+    "animation",
+    "code critique",
+    "design critique",
+    "experiments and play",
+    "group activity",
+    "pair programming"
+  ],
+
+  "instructor": {
+    "name": "Teo Tsivranidis",
+    "url": "https://teo.fyi",
+    "email": "teo@newschool.edu",
+    "color": "#E2231A"
+  },
+
+  "location": {
+    "name": "New York, NY",
+    "timeZone": "America/New_York",
+    "latitude": 40.7128,
+    "longitude": -74.006
+  },
+
+  "students": [
+    { "name": "Anirudh Yanambaka",     "color": "#0073CF", "url": "#" },
+    { "name": "Archit Shah",           "color": "#FFD200", "url": "#" },
+    { "name": "Caroline Li",           "color": "#F58220", "url": "#" },
+    { "name": "Destiny King",          "color": "#6750A4", "url": "#" },
+    { "name": "Elise Lee",             "color": "#E2231A", "url": "#" },
+    { "name": "Ferril Valiya Parambil", "color": "#6B3E26", "url": "#" },
+    { "name": "Kyra Husen",            "color": "#4AA942", "url": "#" },
+    { "name": "Nischaya Shrestha",     "color": "#E2231A", "url": "#" },
+    { "name": "Tara Vathul",           "color": "#4AA942", "url": "#" },
+    { "name": "Yana Tsvilikhovskaya",  "color": "#F58220", "url": "#" },
+    { "name": "You Hyun Oh",           "color": "#6750A4", "url": "#" },
+    { "name": "Yuzi Gong",             "color": "#0073CF", "url": "#" }
+  ]
+}

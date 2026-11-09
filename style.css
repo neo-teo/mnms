@@ -1,0 +1,234 @@
+@font-face {
+  font-family: "ABC Areal";
+  src: url("fonts/ABCAreal-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Turn off macOS rubber-band scrolling so the top bar never bounces */
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: "ABC Areal", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #000;
+  background: #fff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+/* ---------- Layout ---------- */
+
+main {
+  padding: 56px 78px 86px;
+  display: grid;
+  grid-template-columns: 340px 1fr auto;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ---------- Double-line boxes ---------- */
+
+.box {
+  border: 1px solid #000;
+  outline: 1px solid #000;
+  outline-offset: 5px;
+  margin: 6px;
+  padding: 6px 12px;
+}
+
+/* ---------- Left column ---------- */
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.description {
+  margin: 72px 0;
+  font-size: 16px;
+  line-height: 1.25;
+  text-align: justify;
+}
+
+.description p + p {
+  margin-top: 1.25em;
+}
+
+/* Goals sit in light gray; the hovered one turns black */
+.goals a {
+  color: #ccc;
+  transition: color 0.15s;
+}
+
+.goals a:hover {
+  color: #000;
+}
+
+/* ---------- Middle column ---------- */
+
+.students li,
+.instructor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  line-height: 42px;
+  transition: opacity 0.15s;
+}
+
+.dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+
+/* When a student row or bar dot is hovered, fade the other students */
+.students.has-highlight li:not(.highlight) {
+  opacity: 0.2;
+}
+
+.instructor {
+  margin-top: 30px;
+  font-size: 17px;
+}
+
+.instructor a:hover {
+  text-decoration: underline;
+}
+
+.instructor .email {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- Right column ---------- */
+
+.now {
+  padding: 6px 8px;
+}
+
+.now p + p {
+  margin-top: 24px;
+}
+
+.shuffle {
+  display: block;
+  width: calc(100% - 12px);
+  margin-top: 24px;
+  padding: 6px 8px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  cursor: pointer;
+}
+
+.shuffle:hover {
+  background: #f4f4f4;
+}
+
+/* ---------- Top bar ---------- */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 16px 78px;
+  background: #f4f4f4;
+  font-size: 17px;
+  color: #555;
+}
+
+.bar a.link {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.bar a.link:hover {
+  text-decoration: none;
+}
+
+.bar .dot:hover,
+.bar .dot.highlight {
+  transform: scale(1.3);
+}
+
+/* ---------- Mobile: stack the columns ---------- */
+
+@media (max-width: 1100px) {
+  main {
+    grid-template-columns: 1fr;
+    gap: 56px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 44px 16px 48px;
+  }
+
+  /* Unwrap the left column so its pieces can be reordered:
+     course info, students, description, school, weather */
+  .col-left {
+    display: contents;
+  }
+
+  #course       { order: 1; }
+  .col-middle   { order: 2; }
+  .description  { order: 3; margin: 0; }
+  #school       { order: 4; }
+  .col-right    { order: 5; }
+
+  .students li {
+    font-size: 20px;
+    line-height: 38px;
+  }
+
+  /* Weather card becomes two columns:
+     date    | time
+     place   |
+     weather | temp */
+  .now {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 48px;
+  }
+
+  .now p + p {
+    margin-top: 0;
+  }
+
+  #weather {
+    grid-column: 1;
+  }
+
+  .bar {
+    padding: 12px 16px;
+    justify-content: flex-start;
+  }
+}
