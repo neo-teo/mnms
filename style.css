@@ -117,12 +117,18 @@ main {
   transition: transform 0.15s;
 }
 
-.students li {
-  transition: opacity 0.15s;
+.students a,
+.students .dot {
+  transition: color 0.15s, opacity 0.15s;
 }
 
-/* When a student row or bar dot is hovered, fade the other students */
-.students.has-highlight li:not(.highlight) {
+/* When a student row or bar dot is hovered, the other names go light gray
+   (same gray as the goals) and their dots fade */
+.students.has-highlight li:not(.highlight) a {
+  color: #999;
+}
+
+.students.has-highlight li:not(.highlight) .dot {
   opacity: 0.2;
 }
 
