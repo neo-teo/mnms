@@ -122,7 +122,20 @@ function shuffleBar() {
     document.getElementById("typeset"),
     dots[dots.length - 1]
   );
+  checkBarWrap();
 }
+
+// Spread the bar out while it fits on one row; left-align it once it wraps
+function checkBarWrap() {
+  const bar = document.getElementById("bar");
+  const first = bar.firstElementChild;
+  const last = bar.lastElementChild;
+  if (!first) return; // bar not built yet
+  bar.classList.toggle("wrapped", last.offsetTop >= first.offsetTop + first.offsetHeight);
+}
+
+window.addEventListener("resize", checkBarWrap);
+document.fonts.ready.then(checkBarWrap); // text width changes once ABC Areal loads
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
