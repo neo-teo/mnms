@@ -256,27 +256,16 @@ main {
     padding: 44px 16px 48px;
   }
 
-  /* Unwrap the left column so its pieces can be reordered:
-     course info, students, description, school, weather */
-  .col-left {
-    display: contents;
+  .description {
+    margin: 48px 0;
   }
-
-  #course       { order: 1; }
-  .col-middle   { order: 2; }
-  .description  { order: 3; margin: 0; }
-  #school       { order: 4; }
-  .col-right    { order: 5; }
 
   .students a {
     font-size: 20px;
     line-height: 38px;
   }
 
-  /* Weather card becomes two columns:
-     date    | time
-     place   |
-     weather | temp */
+  /* Weather card becomes two columns (lines fill left to right) */
   .now {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -285,10 +274,6 @@ main {
 
   .now p + p {
     margin-top: 0;
-  }
-
-  #weather {
-    grid-column: 1;
   }
 
   /* Character box stretches to the full width, keeping its 140 × 190 shape */

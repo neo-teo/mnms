@@ -10,10 +10,16 @@ fetch("data.json")
     loadWeather(data.location);
     drawCharacter(data);
 
-    // Shuffle button reorders the student list, the goals and the bar dots
+    // Shuffle button reorders the student list, the course info rows,
+    // the weather lines, the goals and the bar dots
     document.getElementById("shuffle").addEventListener("click", () => {
-      const list = document.getElementById("students");
-      shuffle([...list.children]).forEach((li) => list.appendChild(li));
+      for (const el of [
+        document.getElementById("students"),
+        document.getElementById("course"),
+        document.querySelector(".now"),
+      ]) {
+        shuffle([...el.children]).forEach((child) => el.appendChild(child));
+      }
       renderGoals(shuffle([...data.goals]));
       shuffleBar();
       drawCharacter(data);
@@ -116,17 +122,22 @@ function renderBar(data) {
   });
 }
 
-// Shuffles the dots, keeping the design's arrangement:
-// 3 dots, Bulletin Board, dots, Typeset in ABC Areal, last dot
+// Shuffles the dots and splits them into three random groups (at least one each):
+// dots, Bulletin Board, dots, Typeset in ABC Areal, dots
 function shuffleBar() {
   const bar = document.getElementById("bar");
   const dots = shuffle([...bar.querySelectorAll(".dot")]);
+
+  // Pick two different cut points between the dots
+  const positions = Array.from({ length: dots.length - 1 }, (_, i) => i + 1);
+  const [a, b] = shuffle(positions).slice(0, 2).sort((x, y) => x - y);
+
   bar.append(
-    ...dots.slice(0, 3),
+    ...dots.slice(0, a),
     document.getElementById("bulletin"),
-    ...dots.slice(3, -1),
+    ...dots.slice(a, b),
     document.getElementById("typeset"),
-    dots[dots.length - 1]
+    ...dots.slice(b)
   );
   checkBarWrap();
 }
