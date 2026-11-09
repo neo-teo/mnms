@@ -10,16 +10,7 @@ fetch("data.json")
     loadWeather(data.location);
     pickTheme();
 
-    // Shuffle button: shuffle everything, then briefly tint the page
-    // in the new theme color (the animation lives in style.css)
-    document.getElementById("shuffle").addEventListener("click", () => {
-      const overlay = document.getElementById("theme-overlay");
-      if (!overlay.hidden) return; // already shuffling
-
-      shuffleEverything(data);
-      overlay.hidden = false;
-      overlay.addEventListener("animationend", () => (overlay.hidden = true), { once: true });
-    });
+    document.getElementById("shuffle").addEventListener("click", () => shuffleEverything(data));
   })
   .catch(showLoadError);
 
@@ -60,7 +51,7 @@ function shuffle(array) {
 
 // The theme is a random M&M character (never the same one twice in a row).
 // Its color is set once as the --theme CSS variable, which style.css uses for
-// the text selection and the shuffle overlay, and it's also the favicon.
+// the text selection and the shuffle button's dot, and it's also the favicon.
 const CHARACTERS = [
   { src: "assets/mnms/red.webp",    color: "#E2231A" },
   { src: "assets/mnms/yellow.webp", color: "#FFD200" },

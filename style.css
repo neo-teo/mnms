@@ -217,22 +217,6 @@ body.error {
   margin: 24px 0 0;
 }
 
-/* Full-screen tint in the theme color during shuffle (sits under the top bar).
-   The animation replays each time script.js shows it, and hides it when done */
-.theme-overlay {
-  position: fixed;
-  inset: -50vh 0; /* extra height so it still covers everything while mobile toolbars slide */
-  z-index: 1;
-  background: var(--theme);
-  opacity: 0;
-  animation: theme-overlay 500ms ease-in-out;
-}
-
-/* Quick fade in, hold, quick fade out */
-@keyframes theme-overlay {
-  15%, 85% { opacity: 0.1; }
-}
-
 /* ---------- Top bar ---------- */
 
 .bar {
