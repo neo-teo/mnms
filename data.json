@@ -62,6 +62,16 @@
     "color": "#E2231A"
   },
 
+  "characters": [
+    "assets/mnms/red.webp",
+    "assets/mnms/yellow.webp",
+    "assets/mnms/orange.webp",
+    "assets/mnms/purple.webp",
+    "assets/mnms/green.webp",
+    "assets/mnms/brown.webp",
+    "assets/mnms/blue.webp"
+  ],
+
   "location": {
     "name": "New York, NY",
     "timeZone": "America/New_York",

@@ -8,6 +8,7 @@ fetch("data.json")
     renderBar(data);
     startClock(data.location);
     loadWeather(data.location);
+    drawCharacter(data);
 
     // Shuffle button reorders the student list, the goals and the bar dots
     document.getElementById("shuffle").addEventListener("click", () => {
@@ -15,6 +16,7 @@ fetch("data.json")
       shuffle([...list.children]).forEach((li) => list.appendChild(li));
       renderGoals(shuffle([...data.goals]));
       shuffleBar();
+      drawCharacter(data);
     });
   });
 
@@ -128,6 +130,85 @@ function shuffle(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+// ---------- Right column: M&M character ----------
+
+// Picks a random character (never the same one twice in a row)
+// and draws it dithered in the class colors
+let currentCharacter;
+
+function drawCharacter(data) {
+  const others = data.characters.filter((c) => c !== currentCharacter);
+  currentCharacter = others[Math.floor(Math.random() * others.length)];
+
+  // The class palette: every student color, plus black and white
+  const palette = [...new Set(data.students.map((s) => s.color)), "#000000", "#FFFFFF"]
+    .map((hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)));
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById("mnm");
+    // Fit inside a 140 × 190 box so tall and wide characters end up a similar size
+    const scale = Math.min(140 / img.width, 190 / img.height);
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    dither(pixels, palette);
+    ctx.putImageData(pixels, 0, 0);
+  };
+  img.src = currentCharacter;
+}
+
+// Floyd–Steinberg dithering: snap each pixel to the nearest palette color
+// and push the leftover error onto the pixels that haven't been drawn yet
+function dither({ data, width, height }, palette) {
+  // Flatten semi-transparent edges onto white, working in floats
+  const buf = new Float32Array(data.length);
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3] / 255;
+    for (let c = 0; c < 3; c++) buf[i + c] = data[i + c] * a + 255 * (1 - a);
+  }
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      if (data[i + 3] < 128) {
+        data[i + 3] = 0;
+        continue;
+      }
+
+      const old = [buf[i], buf[i + 1], buf[i + 2]];
+      let best = palette[0];
+      let bestDist = Infinity;
+      for (const color of palette) {
+        const dist = (old[0] - color[0]) ** 2 + (old[1] - color[1]) ** 2 + (old[2] - color[2]) ** 2;
+        if (dist < bestDist) {
+          best = color;
+          bestDist = dist;
+        }
+      }
+
+      data[i] = best[0];
+      data[i + 1] = best[1];
+      data[i + 2] = best[2];
+      data[i + 3] = 255;
+
+      const spread = (dx, dy, amount) => {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 0 || nx >= width || ny >= height) return;
+        const j = (ny * width + nx) * 4;
+        for (let c = 0; c < 3; c++) buf[j + c] += (old[c] - best[c]) * amount;
+      };
+      spread(1, 0, 7 / 16);
+      spread(-1, 1, 3 / 16);
+      spread(0, 1, 5 / 16);
+      spread(1, 1, 1 / 16);
+    }
+  }
 }
 
 // ---------- Right column: clock ----------
