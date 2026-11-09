@@ -30,9 +30,9 @@
       <p class="instructor" id="instructor"></p>
     </section>
 
-    <!-- Right: date, time, weather -->
+    <!-- Right: date, time, weather, shuffle, M&M -->
     <section class="col-right">
-      <div class="box now">
+      <div class="box now" id="now">
         <!-- "--" holds each line's space until the clock and weather load -->
         <p id="date">--</p>
         <p id="time">--</p>
@@ -45,8 +45,8 @@
     </section>
   </main>
 
-  <!-- Full-screen color flash shown while shuffling -->
-  <div class="flash" id="flash" hidden></div>
+  <!-- Full-screen theme color tint shown while shuffling -->
+  <div class="theme-overlay" id="theme-overlay" hidden></div>
 
   <script src="script.js"></script>
 </body>

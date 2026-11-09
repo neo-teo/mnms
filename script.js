@@ -8,42 +8,63 @@ fetch("data.json")
     renderBar(data);
     startClock(data.location);
     loadWeather(data.location);
-    drawCharacter(data);
+    pickTheme(data);
 
-    // Shuffle button: shuffle everything and flash the screen
-    // in the new M&M's color for half a second
+    // Shuffle button: shuffle everything, then briefly tint the page
+    // in the new theme color (the animation lives in style.css)
     document.getElementById("shuffle").addEventListener("click", () => {
-      const flash = document.getElementById("flash");
-      if (!flash.hidden) return; // already shuffling
+      const overlay = document.getElementById("theme-overlay");
+      if (!overlay.hidden) return; // already shuffling
 
       shuffleEverything(data);
-      flash.style.background = currentCharacter.color;
-      flash.hidden = false;
-      setTimeout(() => {
-        flash.hidden = true;
-      }, 500);
+      overlay.hidden = false;
+      overlay.addEventListener("animationend", () => (overlay.hidden = true), { once: true });
     });
   });
 
-// Favicon: a circle in the given color
-function setFavicon(color) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
-  document.getElementById("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
-}
-
 // Reorders the student list, the course info rows, the weather lines,
-// the goals and the bar dots, and picks a new M&M
+// the goals and the bar dots, and picks a new theme
 function shuffleEverything(data) {
   for (const el of [
     document.getElementById("students"),
     document.getElementById("course"),
-    document.querySelector(".now"),
+    document.getElementById("now"),
   ]) {
     shuffle([...el.children]).forEach((child) => el.appendChild(child));
   }
   renderGoals(shuffle([...data.goals]));
   shuffleBar();
-  drawCharacter(data);
+  pickTheme(data);
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// ---------- Theme ----------
+
+// The theme is a random M&M character (never the same one twice in a row).
+// Its color is set once as the --theme CSS variable, which style.css uses for
+// the text selection and the shuffle overlay, and it's also the favicon.
+let theme;
+
+function pickTheme(data) {
+  const others = data.characters.filter((c) => c !== theme);
+  theme = others[Math.floor(Math.random() * others.length)];
+
+  document.documentElement.style.setProperty("--theme", theme.color);
+  setFavicon(theme.color);
+  loadCharacter(theme);
+}
+
+// Favicon: a circle in the given color
+function setFavicon(color) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
+  document.getElementById("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
 }
 
 // ---------- Left column ----------
@@ -168,39 +189,23 @@ function checkBarWrap() {
 window.addEventListener("resize", checkBarWrap);
 document.fonts.ready.then(checkBarWrap); // text width changes once ABC Areal loads
 
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
 // ---------- Right column: M&M character ----------
 
-// Picks a random character (never the same one twice in a row),
-// dithers it in its own color plus grayscale, and draws each pixel as a dot
+// The theme's character, dithered in its own color plus grayscale,
+// with each pixel drawn as a dot
 const BOX_W = 140; // the character box, in desktop px
 const BOX_H = 190;
 const DOT = 2;     // size of each dot, in desktop px
 
-let currentCharacter;
 let characterImage;
 
-function drawCharacter(data) {
-  const others = data.characters.filter((c) => c !== currentCharacter);
-  currentCharacter = others[Math.floor(Math.random() * others.length)];
-
-  // Favicon and text selection color match the character
-  setFavicon(currentCharacter.color);
-  document.documentElement.style.setProperty("--highlight", currentCharacter.color + "55");
-
+function loadCharacter(character) {
   const img = new Image();
   img.onload = () => {
     characterImage = img;
     renderCharacter();
   };
-  img.src = currentCharacter.src;
+  img.src = character.src;
 }
 
 // Redrawn on resize so the dots stay sharp at any size (e.g. full width on mobile)
@@ -211,7 +216,7 @@ function renderCharacter() {
   const img = characterImage;
 
   // The character's color, a darker shade and a lighter tint of it, plus grays
-  const color = [1, 3, 5].map((i) => parseInt(currentCharacter.color.slice(i, i + 2), 16));
+  const color = [1, 3, 5].map((i) => parseInt(theme.color.slice(i, i + 2), 16));
   const mix = (target, amount) => color.map((c) => c + (target - c) * amount);
   const grays = [0, 51, 102, 153, 204, 255].map((v) => [v, v, v]);
   const palette = [color, mix(0, 0.45), mix(255, 0.45), ...grays];

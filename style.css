@@ -25,9 +25,13 @@ body {
   background: #fff;
 }
 
-/* Text selection color; script.js matches it to the current M&M */
+/* --theme is the current M&M's color, set by script.js */
+:root {
+  --theme: #0073CF;
+}
+
 ::selection {
-  background: var(--highlight, #0073CF55);
+  background: color-mix(in srgb, var(--theme) 33%, transparent);
 }
 
 a {
@@ -98,7 +102,6 @@ main {
   align-items: center;
   font-size: 24px;
   line-height: 42px;
-  transition: opacity 0.15s;
 }
 
 .dot {
@@ -178,18 +181,19 @@ main {
   margin: 24px auto 0;
 }
 
-/* Full-screen color flash during shuffle (sits under the top bar).
-   Replays every time it's shown; lasts as long as script.js shows it */
-.flash {
+/* Full-screen tint in the theme color during shuffle (sits under the top bar).
+   The animation replays each time script.js shows it, and hides it when done */
+.theme-overlay {
   position: fixed;
-  inset: 0;
+  inset: -50vh 0; /* extra height so it still covers everything while mobile toolbars slide */
   z-index: 1;
+  background: var(--theme);
   opacity: 0;
-  animation: flash 500ms ease-in-out;
+  animation: theme-overlay 500ms ease-in-out;
 }
 
 /* Quick fade in, hold, quick fade out */
-@keyframes flash {
+@keyframes theme-overlay {
   15%, 85% { opacity: 0.1; }
 }
 
