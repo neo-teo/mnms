@@ -156,20 +156,28 @@ main {
   text-decoration: underline;
 }
 
+/* Theme color dot on the left, "Shuffle" on the right */
 .shuffle {
-  display: block;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   width: calc(100% - 12px);
   margin-top: 24px;
   padding: 6px 8px;
   font: inherit;
   color: inherit;
-  text-align: center;
   background: none;
   cursor: pointer;
 }
 
-.shuffle:hover {
+.shuffle:hover .shuffle-label {
   text-decoration: underline;
+}
+
+/* Shows the current theme color */
+.theme-dot {
+  background: var(--theme);
 }
 
 /* A fixed 140 × 190 box so the column never changes width.
