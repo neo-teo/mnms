@@ -3,7 +3,6 @@ fetch("data.json")
   .then((res) => res.json())
   .then((data) => {
     document.title = data.site.title;
-    setFavicon(data);
     renderCourse(data);
     renderStudents(data);
     renderBar(data);
@@ -21,10 +20,8 @@ fetch("data.json")
     });
   });
 
-// Favicon: a circle in a random class color
-function setFavicon(data) {
-  const colors = [...new Set(data.students.map((s) => s.color))];
-  const color = colors[Math.floor(Math.random() * colors.length)];
+// Favicon: a circle in the given color
+function setFavicon(color) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
   document.getElementById("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
 }
@@ -168,6 +165,10 @@ let characterImage;
 function drawCharacter(data) {
   const others = data.characters.filter((c) => c !== currentCharacter);
   currentCharacter = others[Math.floor(Math.random() * others.length)];
+
+  // Favicon and text selection color match the character
+  setFavicon(currentCharacter.color);
+  document.documentElement.style.setProperty("--highlight", currentCharacter.color + "55");
 
   const img = new Image();
   img.onload = () => {

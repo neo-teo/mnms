@@ -25,6 +25,11 @@ body {
   background: #fff;
 }
 
+/* Text selection color; script.js matches it to the current M&M */
+::selection {
+  background: var(--highlight, #0073CF55);
+}
+
 a {
   color: inherit;
   text-decoration: none;
