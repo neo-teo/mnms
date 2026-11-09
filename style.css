@@ -165,16 +165,12 @@ main {
 }
 
 /* A fixed 140 × 190 box so the column never changes width.
-   Characters are dithered to fit inside it (script.js) and shown at
-   their actual size, sitting at the bottom; pixelated keeps the dots crisp */
+   script.js draws the dotted character inside it */
 .mnm {
   display: block;
   width: 140px;
   height: 190px;
   margin: 24px auto 0;
-  object-fit: none;
-  object-position: center bottom;
-  image-rendering: pixelated;
 }
 
 /* ---------- Top bar ---------- */
@@ -259,7 +255,6 @@ main {
     width: 100%;
     height: auto;
     aspect-ratio: 140 / 190;
-    object-fit: contain;
   }
 
   .bar {

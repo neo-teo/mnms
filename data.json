@@ -63,13 +63,13 @@
   },
 
   "characters": [
-    "assets/mnms/red.webp",
-    "assets/mnms/yellow.webp",
-    "assets/mnms/orange.webp",
-    "assets/mnms/purple.webp",
-    "assets/mnms/green.webp",
-    "assets/mnms/brown.webp",
-    "assets/mnms/blue.webp"
+    { "src": "assets/mnms/red.webp",    "color": "#E2231A" },
+    { "src": "assets/mnms/yellow.webp", "color": "#FFD200" },
+    { "src": "assets/mnms/orange.webp", "color": "#F58220" },
+    { "src": "assets/mnms/purple.webp", "color": "#6750A4" },
+    { "src": "assets/mnms/green.webp",  "color": "#4AA942" },
+    { "src": "assets/mnms/brown.webp",  "color": "#6B3E26" },
+    { "src": "assets/mnms/blue.webp",   "color": "#0073CF" }
   ],
 
   "location": {

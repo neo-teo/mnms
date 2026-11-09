@@ -134,32 +134,77 @@ function shuffle(array) {
 
 // ---------- Right column: M&M character ----------
 
-// Picks a random character (never the same one twice in a row)
-// and draws it dithered in the class colors
+// Picks a random character (never the same one twice in a row),
+// dithers it in its own color plus grayscale, and draws each pixel as a dot
+const BOX_W = 140; // the character box, in desktop px
+const BOX_H = 190;
+const DOT = 2;     // size of each dot, in desktop px
+
 let currentCharacter;
+let characterImage;
 
 function drawCharacter(data) {
   const others = data.characters.filter((c) => c !== currentCharacter);
   currentCharacter = others[Math.floor(Math.random() * others.length)];
 
-  // The class palette: every student color, plus black and white
-  const palette = [...new Set(data.students.map((s) => s.color)), "#000000", "#FFFFFF"]
-    .map((hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)));
-
   const img = new Image();
   img.onload = () => {
-    const canvas = document.getElementById("mnm");
-    // Fit inside a 140 × 190 box so tall and wide characters end up a similar size
-    const scale = Math.min(140 / img.width, 190 / img.height);
-    canvas.width = Math.round(img.width * scale);
-    canvas.height = Math.round(img.height * scale);
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    dither(pixels, palette);
-    ctx.putImageData(pixels, 0, 0);
+    characterImage = img;
+    renderCharacter();
   };
-  img.src = currentCharacter;
+  img.src = currentCharacter.src;
+}
+
+// Redrawn on resize so the dots stay sharp at any size (e.g. full width on mobile)
+window.addEventListener("resize", renderCharacter);
+
+function renderCharacter() {
+  if (!characterImage) return;
+  const img = characterImage;
+
+  // The character's color, a darker shade and a lighter tint of it, plus grays
+  const color = [1, 3, 5].map((i) => parseInt(currentCharacter.color.slice(i, i + 2), 16));
+  const mix = (target, amount) => color.map((c) => c + (target - c) * amount);
+  const grays = [0, 51, 102, 153, 204, 255].map((v) => [v, v, v]);
+  const palette = [color, mix(0, 0.45), mix(255, 0.45), ...grays];
+
+  // 1. Shrink the character to one pixel per dot (fit inside the box) and dither it
+  const fit = Math.min(BOX_W / img.width, BOX_H / img.height);
+  const cols = Math.round(img.width * fit / DOT);
+  const rows = Math.round(img.height * fit / DOT);
+  const small = document.createElement("canvas");
+  small.width = cols;
+  small.height = rows;
+  const smallCtx = small.getContext("2d");
+  smallCtx.imageSmoothingQuality = "high";
+  smallCtx.drawImage(img, 0, 0, cols, rows);
+  const pixels = smallCtx.getImageData(0, 0, cols, rows);
+  dither(pixels, palette);
+
+  // 2. Draw each dithered pixel as a circle, at full screen resolution
+  const canvas = document.getElementById("mnm");
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.round(canvas.clientWidth * ratio);
+  canvas.height = Math.round(canvas.clientHeight * ratio);
+  const ctx = canvas.getContext("2d");
+
+  const size = DOT * (canvas.width / BOX_W);    // dot size in canvas pixels
+  const left = (canvas.width - cols * size) / 2; // centered...
+  const top = canvas.height - rows * size;       // ...standing on the bottom
+
+  const { data } = pixels;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const i = (y * cols + x) * 4;
+      const isWhite = data[i] === 255 && data[i + 1] === 255 && data[i + 2] === 255;
+      if (data[i + 3] === 0 || isWhite) continue;
+
+      ctx.fillStyle = `rgb(${data[i]}, ${data[i + 1]}, ${data[i + 2]})`;
+      ctx.beginPath();
+      ctx.arc(left + (x + 0.5) * size, top + (y + 0.5) * size, size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 }
 
 // Floyd–Steinberg dithering: snap each pixel to the nearest palette color
