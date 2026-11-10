@@ -25,9 +25,16 @@ body {
   background: #fff;
 }
 
-/* --theme is the current M&M's color, set by script.js */
+/* --theme is the current M&M's color and --cursor a dot in that color,
+   both set by script.js */
 :root {
   --theme: #0073CF;
+  --cursor: auto;
+}
+
+/* The dot cursor everywhere, links and buttons included */
+* {
+  cursor: var(--cursor);
 }
 
 ::selection {
@@ -117,19 +124,10 @@ main {
   transition: transform 0.15s;
 }
 
-.students a,
-.students .dot {
-  transition: color 0.15s, opacity 0.15s;
-}
-
-/* When a student row or bar dot is hovered, the other names go light gray
-   (same gray as the goals) and their dots fade */
-.students.has-highlight li:not(.highlight) a {
-  color: #999;
-}
-
-.students.has-highlight li:not(.highlight) .dot {
-  opacity: 0.2;
+/* Hovering a student's row or their bar dot underlines their name,
+   like the other links */
+.students li.highlight a {
+  text-decoration: underline;
 }
 
 .instructor {
@@ -166,28 +164,19 @@ main {
   text-decoration: underline;
 }
 
-/* Theme color dot on the left, "Shuffle" on the right */
 .shuffle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  display: block;
   width: calc(100% - 12px);
   margin-top: 24px;
   padding: 6px 8px;
   font: inherit;
   color: inherit;
+  text-align: center;
   background: none;
-  cursor: pointer;
 }
 
-.shuffle:hover .shuffle-label {
+.shuffle:hover {
   text-decoration: underline;
-}
-
-/* Shows the current theme color */
-.theme-dot {
-  background: var(--theme);
 }
 
 /* A fixed 140 × 190 box so the column never changes width.

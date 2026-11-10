@@ -51,7 +51,7 @@ function shuffle(array) {
 
 // The theme is a random M&M character (never the same one twice in a row).
 // Its color is set once as the --theme CSS variable, which style.css uses for
-// the text selection and the shuffle button's dot, and it's also the favicon.
+// the text selection, and it's also the favicon and the cursor.
 const CHARACTERS = [
   { src: "assets/mnms/red.webp",    color: "#E2231A" },
   { src: "assets/mnms/yellow.webp", color: "#FFD200" },
@@ -70,13 +70,23 @@ function pickTheme() {
 
   document.documentElement.style.setProperty("--theme", theme.color);
   setFavicon(theme.color);
+  setCursor(theme.color);
   loadCharacter(theme);
 }
 
-// Favicon: a circle in the given color
+// A circle in the given color, as an SVG data URL
+function dotImage(color, size) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
+  return "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
 function setFavicon(color) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
-  document.getElementById("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
+  document.getElementById("favicon").href = dotImage(color, 10);
+}
+
+// Cursor: a 20px dot, the same size as the student dots, clicking from its center
+function setCursor(color) {
+  document.documentElement.style.setProperty("--cursor", `url("${dotImage(color, 20)}") 10 10, auto`);
 }
 
 // ---------- Left column ----------
@@ -157,7 +167,6 @@ function renderBar(data) {
     const dot = bar.querySelector(`.dot[data-index="${li.dataset.index}"]`);
 
     function highlight(on) {
-      list.classList.toggle("has-highlight", on);
       li.classList.toggle("highlight", on);
       dot.classList.toggle("highlight", on);
     }
@@ -211,9 +220,16 @@ const DOT = 2;     // size of each dot, in desktop px
 
 let characterImage;
 
+// The old character disappears the moment a new one is picked, leaving the
+// empty box as a placeholder until the new image loads
 function loadCharacter(character) {
+  characterImage = null;
+  const canvas = document.getElementById("mnm");
+  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
   const img = new Image();
   img.onload = () => {
+    if (character !== theme) return; // already shuffled again while this loaded
     characterImage = img;
     renderCharacter();
   };
