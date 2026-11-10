@@ -20,6 +20,16 @@ try {
   if (localStorage.getItem("lights") === "off") setLights(false);
 } catch {}
 
+// ---------- Remembering ----------
+
+// Within a tab, the theme, the bar's order and Shuffle's order carry over
+// between pages (sessionStorage). Refreshing a page starts everything fresh.
+if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
+  try {
+    for (const key of ["theme", "bar", "shuffle"]) sessionStorage.removeItem(key);
+  } catch {}
+}
+
 // ---------- Theme ----------
 
 // The theme is a random M&M character (never the same one twice in a row).
@@ -43,8 +53,9 @@ function pickTheme() {
   setTheme(others[Math.floor(Math.random() * others.length)]);
 }
 
-// Other pages keep the color the home page last picked, so the cursor
-// doesn't change when you click through (random if there isn't one)
+// Pages open with the theme picked last in this tab, so moving between them
+// (or coming back) doesn't change it. A new tab or a refresh starts with a
+// random one, and Shuffle picks a new one.
 function keepTheme() {
   let saved;
   try {

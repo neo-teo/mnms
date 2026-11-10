@@ -8,7 +8,8 @@ fetch("data.json")
     renderBar(data);
     startClock(data.location);
     loadWeather(data.location);
-    pickTheme();
+    restoreShuffle(data);
+    keepTheme();
     loadCharacter(theme);
 
     document.getElementById("shuffle").addEventListener("click", () => shuffleEverything(data));
@@ -34,20 +35,56 @@ function showLoadError() {
   loadCharacter(theme);
 }
 
+// The lists Shuffle reorders. Each item is known by its id or data-index
+const SHUFFLED_LISTS = ["students", "course", "now"];
+const itemKey = (el) => el.id || el.dataset.index;
+
 // Reorders the student list, the course info rows, the weather lines,
 // the goals and the bar dots, and picks a new theme
 function shuffleEverything(data) {
-  for (const el of [
-    document.getElementById("students"),
-    document.getElementById("course"),
-    document.getElementById("now"),
-  ]) {
+  for (const id of SHUFFLED_LISTS) {
+    const el = document.getElementById(id);
     shuffle([...el.children]).forEach((child) => el.appendChild(child));
   }
-  renderGoals(shuffle([...data.goals]));
+  const goals = shuffle([...data.goals]);
+  renderGoals(goals);
   shuffleBar();
   pickTheme();
   loadCharacter(theme);
+  saveShuffle(goals);
+}
+
+// The shuffled order is remembered for this tab (like the theme and the bar),
+// so coming back from the Bulletin Board shows the page as you left it.
+// Refreshing starts over (shared.js)
+function saveShuffle(goals) {
+  const order = { goals };
+  for (const id of SHUFFLED_LISTS) {
+    order[id] = [...document.getElementById(id).children].map(itemKey);
+  }
+  try {
+    sessionStorage.setItem("shuffle", JSON.stringify(order));
+  } catch {}
+}
+
+function restoreShuffle(data) {
+  let order;
+  try {
+    order = JSON.parse(sessionStorage.getItem("shuffle"));
+  } catch {}
+  if (!order) return;
+
+  for (const id of SHUFFLED_LISTS) {
+    const el = document.getElementById(id);
+    const items = new Map([...el.children].map((child) => [itemKey(child), child]));
+    for (const key of order[id] || []) {
+      if (items.has(key)) el.appendChild(items.get(key));
+    }
+  }
+  // Only if they're still the same goals (data.json may have changed)
+  const sameGoals = order.goals?.length === data.goals.length
+    && data.goals.every((goal) => order.goals.includes(goal));
+  if (sameGoals) renderGoals(order.goals);
 }
 
 // ---------- Left column ----------
@@ -56,10 +93,10 @@ function renderCourse(data) {
   const c = data.course;
 
   document.getElementById("course").innerHTML = `
-    <div class="row"><span>${c.name}</span><span>${c.term}</span></div>
-    <div class="row"><span>${c.section}</span><span>${c.nickname}</span></div>
-    <div class="row"><span>${c.day}</span><span>${c.time}</span></div>
-    <div class="row"><span>${c.location}</span><span>${c.room}</span></div>
+    <div class="row" data-index="0"><span>${c.name}</span><span>${c.term}</span></div>
+    <div class="row" data-index="1"><span>${c.section}</span><span>${c.nickname}</span></div>
+    <div class="row" data-index="2"><span>${c.day}</span><span>${c.time}</span></div>
+    <div class="row" data-index="3"><span>${c.location}</span><span>${c.room}</span></div>
   `;
 
   document.getElementById("description").textContent = data.description;
@@ -109,7 +146,7 @@ function renderStudents(data) {
 
 function renderBar(data) {
   buildBar(data, `<a class="link" id="bar-link" href="bulletin.html">Bulletin Board</a>`);
-  shuffleBar();
+  arrangeBar(savedBarLayout() || randomBarLayout());
 
   // Hovering a student's row or their bar dot highlights that student in both places
   const list = document.getElementById("students");
