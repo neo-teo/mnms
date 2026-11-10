@@ -13,10 +13,12 @@
   <meta property="og:description" content="Critical Computation Lab, Section B — Parsons School of Design, Fall 2026. Taught by Teo Tsivranidis.">
   <meta name="twitter:card" content="summary">
   <link rel="preload" href="fonts/ABCAreal-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <!-- Orange dot for link previews and bookmarks; script.js recolors it to the theme -->
+  <!-- Orange dot for link previews and bookmarks; shared.js recolors it to the theme -->
   <link rel="icon" id="favicon" href="favicon.svg">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
+  <!-- In the head so dark mode is on before the page draws -->
+  <script src="shared.js"></script>
 </head>
 <body>
 
@@ -40,7 +42,7 @@
       <p class="instructor" id="instructor"></p>
     </section>
 
-    <!-- Right: date, time, weather, shuffle, M&M -->
+    <!-- Right: date, time, weather, lights, shuffle, M&M -->
     <section class="col-right">
       <div class="box now" id="now">
         <!-- "--" holds each line's space until the clock and weather load -->
@@ -50,7 +52,8 @@
         <p id="weather">--</p>
         <p id="temp">--</p>
       </div>
-      <button class="box shuffle" id="shuffle">Shuffle</button>
+      <button class="box button" id="lights" aria-pressed="false">Lights</button>
+      <button class="box button" id="shuffle">Shuffle</button>
       <canvas class="mnm" id="mnm" role="img" aria-label="An M&amp;M character"></canvas>
     </section>
   </main>

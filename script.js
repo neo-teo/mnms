@@ -9,8 +9,17 @@ fetch("data.json")
     startClock(data.location);
     loadWeather(data.location);
     pickTheme();
+    loadCharacter(theme);
 
     document.getElementById("shuffle").addEventListener("click", () => shuffleEverything(data));
+
+    const lights = document.getElementById("lights");
+    lights.setAttribute("aria-pressed", lightsOff());
+    lights.addEventListener("click", () => {
+      setLights(lightsOff());
+      lights.setAttribute("aria-pressed", lightsOff());
+      renderCharacter(); // its white dots only show with the lights off
+    });
   })
   .catch(showLoadError);
 
@@ -22,6 +31,7 @@ function showLoadError() {
     <canvas class="mnm mnm-full" id="mnm" role="img" aria-label="An M&amp;M character"></canvas>
   `;
   pickTheme();
+  loadCharacter(theme);
 }
 
 // Reorders the student list, the course info rows, the weather lines,
@@ -37,56 +47,7 @@ function shuffleEverything(data) {
   renderGoals(shuffle([...data.goals]));
   shuffleBar();
   pickTheme();
-}
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-// ---------- Theme ----------
-
-// The theme is a random M&M character (never the same one twice in a row).
-// Its color is set once as the --theme CSS variable, which style.css uses for
-// the text selection, and it's also the favicon and the cursor.
-const CHARACTERS = [
-  { src: "assets/mnms/red.webp",    color: "#E2231A" },
-  { src: "assets/mnms/yellow.webp", color: "#FFD200" },
-  { src: "assets/mnms/orange.webp", color: "#F58220" },
-  { src: "assets/mnms/purple.webp", color: "#6750A4" },
-  { src: "assets/mnms/green.webp",  color: "#4AA942" },
-  { src: "assets/mnms/brown.webp",  color: "#6B3E26" },
-  { src: "assets/mnms/blue.webp",   color: "#0073CF" },
-];
-
-let theme;
-
-function pickTheme() {
-  const others = CHARACTERS.filter((c) => c !== theme);
-  theme = others[Math.floor(Math.random() * others.length)];
-
-  document.documentElement.style.setProperty("--theme", theme.color);
-  setFavicon(theme.color);
-  setCursor(theme.color);
   loadCharacter(theme);
-}
-
-// A circle in the given color, as an SVG data URL
-function dotImage(color, size) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="${color}"/></svg>`;
-  return "data:image/svg+xml," + encodeURIComponent(svg);
-}
-
-function setFavicon(color) {
-  document.getElementById("favicon").href = dotImage(color, 10);
-}
-
-// Cursor: a 20px dot, the same size as the student dots, clicking from its center
-function setCursor(color) {
-  document.documentElement.style.setProperty("--cursor", `url("${dotImage(color, 20)}") 10 10, auto`);
 }
 
 // ---------- Left column ----------
@@ -123,10 +84,11 @@ function renderGoals(goals) {
 // ---------- Middle column ----------
 
 function renderStudents(data) {
+  // Names link nowhere for now (each student's site is still s.url in data.json)
   document.getElementById("students").innerHTML = data.students
     .map((s, i) => `
       <li data-index="${i}">
-        <a href="${s.url}" target="_blank">
+        <a href="#">
           ${s.name}
           <span class="dot" style="background: ${s.color}"></span>
         </a>
@@ -146,25 +108,13 @@ function renderStudents(data) {
 // ---------- Top bar ----------
 
 function renderBar(data) {
-  // Every student gets a dot
-  const dots = data.students.map((s, i) => `
-    <a class="dot" href="${s.url}" target="_blank" data-index="${i}"
-       style="background: ${s.color}" title="${s.name}" aria-label="${s.name}"></a>
-  `);
-
-  const bar = document.getElementById("bar");
-  bar.innerHTML = dots.join("") + `
-    <a class="link" id="bulletin" href="${data.site.bulletinBoard}" target="_blank">Bulletin Board</a>
-    <span id="typeset">Typeset in
-      <a class="link" href="${data.site.typeface.url}" target="_blank">${data.site.typeface.name}</a>
-    </span>
-  `;
+  buildBar(data, `<a class="link" id="bar-link" href="bulletin.html">Bulletin Board</a>`);
   shuffleBar();
 
   // Hovering a student's row or their bar dot highlights that student in both places
   const list = document.getElementById("students");
   list.querySelectorAll("li").forEach((li) => {
-    const dot = bar.querySelector(`.dot[data-index="${li.dataset.index}"]`);
+    const dot = document.querySelector(`#bar .dot[data-index="${li.dataset.index}"]`);
 
     function highlight(on) {
       li.classList.toggle("highlight", on);
@@ -178,37 +128,10 @@ function renderBar(data) {
   });
 }
 
-// Shuffles the dots and splits them into three random groups (at least one each):
-// dots, Bulletin Board, dots, Typeset in ABC Areal, dots
+// A new random arrangement of the bar (remembered for the Bulletin Board)
 function shuffleBar() {
-  const bar = document.getElementById("bar");
-  const dots = shuffle([...bar.querySelectorAll(".dot")]);
-
-  // Pick two different cut points between the dots
-  const positions = Array.from({ length: dots.length - 1 }, (_, i) => i + 1);
-  const [a, b] = shuffle(positions).slice(0, 2).sort((x, y) => x - y);
-
-  bar.append(
-    ...dots.slice(0, a),
-    document.getElementById("bulletin"),
-    ...dots.slice(a, b),
-    document.getElementById("typeset"),
-    ...dots.slice(b)
-  );
-  checkBarWrap();
+  arrangeBar(randomBarLayout());
 }
-
-// Spread the bar out while it fits on one row; left-align it once it wraps
-function checkBarWrap() {
-  const bar = document.getElementById("bar");
-  const first = bar.firstElementChild;
-  const last = bar.lastElementChild;
-  if (!first) return; // bar not built yet
-  bar.classList.toggle("wrapped", last.offsetTop >= first.offsetTop + first.offsetHeight);
-}
-
-window.addEventListener("resize", checkBarWrap);
-document.fonts.ready.then(checkBarWrap); // text width changes once ABC Areal loads
 
 // ---------- Right column: M&M character ----------
 
@@ -278,8 +201,10 @@ function renderCharacter() {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const i = (y * cols + x) * 4;
+      // White dots are left out on the light paper (they'd look like holes),
+      // but drawn with the lights off, where they're the gloves and eyes
       const isWhite = data[i] === 255 && data[i + 1] === 255 && data[i + 2] === 255;
-      if (data[i + 3] === 0 || isWhite) continue;
+      if (data[i + 3] === 0 || (isWhite && !lightsOff())) continue;
 
       ctx.fillStyle = `rgb(${data[i]}, ${data[i + 1]}, ${data[i + 2]})`;
       ctx.beginPath();
